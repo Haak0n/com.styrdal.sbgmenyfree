@@ -13,10 +13,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.format.Time;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -28,6 +28,16 @@ public class MainFragment extends ListFragment
 	public final static String EXTRA_MESSAGE = "com.styrdal.SbgMeny.MESSAGE";
 	private AdView adView;
 	private String adUnitId = "ca-app-pub-6095611948758304/4308520274";
+	
+	private SQLiteDatabase db;
+	
+	//Enabling options menu
+	@Override
+	public void onActivityCreated(Bundle savedState)
+	{
+		super.onActivityCreated(savedState);
+		setHasOptionsMenu(true);
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -46,17 +56,14 @@ public class MainFragment extends ListFragment
 			
 			String dbName = "restauranger.db";
 			mDbHelper = new RestaurantsDBHelper(context, dbName, dbName);
-			SQLiteDatabase db = mDbHelper.getWritableDatabase();
+			db = mDbHelper.getWritableDatabase();
 			
-			String[] cursorProjection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, timesToday()};
+			String[] cursorProjection = cursorProjection();
 			String sortOrder = RestaurantsEntry.COLUMN_NAME_NAME + " ASC";
 			
 			Cursor c = db.query(RestaurantsEntry.TABLE_NAME, cursorProjection, null, null, null, null, sortOrder);
 			
-			String[] selection =  {RestaurantsEntry.COLUMN_NAME_NAME, timesToday()};
-			int[] displays =  {R.id.main_name, R.id.main_open};
-			
-			SimpleCursorAdapter adapter = new SimpleCursorAdapter(context, R.layout.main_list, c, selection, displays, 0);
+			MainListAdapter adapter = new MainListAdapter(context, c, cursorProjection[3], cursorProjection[4]);
 			
 			setListAdapter(adapter);	
 		}
@@ -85,46 +92,66 @@ public class MainFragment extends ListFragment
     	startActivity(intent);
 	    
 	}
+	
 	//Getting the correct day column for today
-	private String timesToday()
-	{
-		Time today = new Time(Time.getCurrentTimezone());
-		today.setToNow();
-		int day = today.weekDay;
+		private String[] cursorProjection()
+		{
+			Time today = new Time(Time.getCurrentTimezone());
+			today.setToNow();
+			int day = today.weekDay;
+			
+			if (day == today.MONDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_MONDAY_OPEN, RestaurantsEntry.COLUMN_NAME_MONDAY_CLOSE};
+				return projection;
+			}
+			else if (day == today.TUESDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_TUESDAY_OPEN, RestaurantsEntry.COLUMN_NAME_TUESDAY_CLOSE};
+				return projection;
+			}
+			else if (day == today.WEDNESDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_WEDNESDAY_OPEN, RestaurantsEntry.COLUMN_NAME_WEDNESDAY_CLOSE};
+				return projection;
+			}
+			else if (day == today.THURSDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_THURSDAY_OPEN, RestaurantsEntry.COLUMN_NAME_THURSDAY_CLOSE};
+				return projection;
+			}
+			else if (day == today.FRIDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_FRIDAY_OPEN, RestaurantsEntry.COLUMN_NAME_FRIDAY_CLOSE};
+				return projection;
+			}
+			else if (day == today.SATURDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_SATURDAY_OPEN, RestaurantsEntry.COLUMN_NAME_SATURDAY_CLOSE};
+				return projection;
+			}
+			else if (day == today.SUNDAY)
+			{
+				String[] projection = {RestaurantsEntry.COLUMN_NAME_NAME, RestaurantsEntry._ID, RestaurantsEntry.COLUMN_NAME_IDNAME, RestaurantsEntry.COLUMN_NAME_SUNDAY_OPEN, RestaurantsEntry.COLUMN_NAME_SUNDAY_CLOSE};
+				return projection;
+			}
+			else
+			{
+				Log.e(TAG, "Invalid day of week. Exiting.");
+				System.exit(0);
+				return null;
+			}
+		}
 		
-		if (day == today.MONDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_MONDAY;
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			Log.i(TAG, "pressed a button!");
+		    switch (item.getItemId()) {
+		    case R.id.update_database:
+		    	UpdateDatabase updateDatabase = new UpdateDatabase(db);
+		    	updateDatabase.checkUpdate(getFragmentManager(), getActivity());
+		    	return true;
+		    }
+		    return super.onOptionsItemSelected(item);
 		}
-		else if (day == today.TUESDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_TUESDAY;
-		}
-		else if (day == today.WEDNESDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_WEDNESDAY;
-		}
-		else if (day == today.THURSDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_THURSDAY;
-		}
-		else if (day == today.FRIDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_FRIDAY;
-		}
-		else if (day == today.SATURDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_SATURDAY;
-		}
-		else if (day == today.SUNDAY)
-		{
-			return RestaurantsEntry.COLUMN_NAME_SUNDAY;
-		}
-		else
-		{
-			Log.e(TAG, "Invalid day of week. Exiting.");
-			System.exit(0);
-			return null;
-		}
-	}
 }

@@ -14,7 +14,7 @@ public class Restaurant {
 	
 	private String name;
 	private String address;
-	private int number;
+	private String number;
 	private String url;
 	private String extra;
 	private String monday;
@@ -25,6 +25,8 @@ public class Restaurant {
 	private String saturday;
 	private String sunday;
 	private String idname;
+	private boolean daily;
+	private boolean standard;
 	private String today;
 	
 	public Restaurant()	{}
@@ -32,18 +34,28 @@ public class Restaurant {
 	//Getting all the attributes for the Restaurant from the database from idname. Needs context for database connection.
 	public Restaurant(String idname, Context context, SQLiteDatabase db)
 	{
+		this.idname = idname;
 		String[] cursorProjection = { RestaurantsEntry.COLUMN_NAME_NAME,
 				RestaurantsEntry.COLUMN_NAME_ADDRESS, 
 				RestaurantsEntry.COLUMN_NAME_NUMBER, 
 				RestaurantsEntry.COLUMN_NAME_URL, 
 				RestaurantsEntry.COLUMN_NAME_EXTRA,
-				RestaurantsEntry.COLUMN_NAME_MONDAY,
-				RestaurantsEntry.COLUMN_NAME_TUESDAY,
-				RestaurantsEntry.COLUMN_NAME_WEDNESDAY,
-				RestaurantsEntry.COLUMN_NAME_THURSDAY,
-				RestaurantsEntry.COLUMN_NAME_FRIDAY,
-				RestaurantsEntry.COLUMN_NAME_SATURDAY,
-				RestaurantsEntry.COLUMN_NAME_SUNDAY
+				RestaurantsEntry.COLUMN_NAME_MONDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_TUESDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_WEDNESDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_THURSDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_FRIDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_SATURDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_SUNDAY_OPEN,
+				RestaurantsEntry.COLUMN_NAME_MONDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_TUESDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_WEDNESDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_THURSDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_FRIDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_SATURDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_SUNDAY_CLOSE,
+				RestaurantsEntry.COLUMN_NAME_DAILY,
+				RestaurantsEntry.COLUMN_NAME_STANDARD
 				};
 		
 		String sortOrder = RestaurantsEntry._ID + " ASC";
@@ -64,24 +76,61 @@ public class Restaurant {
 		
 		this.name = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_NAME));
 		this.address = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_ADDRESS));
-		this.number = c.getInt(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_NUMBER));
+		this.number = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_NUMBER));
 		this.url = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_URL));
 		this.extra = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_EXTRA));
 
-		this.monday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_MONDAY));
-		this.tuesday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_TUESDAY));
-		this.wednesday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_WEDNESDAY));
-		this.thursday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_THURSDAY));
-		this.friday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_FRIDAY));
-		this.saturday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_SATURDAY));
-		this.sunday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_SUNDAY));
+		this.monday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_MONDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_MONDAY_CLOSE));
+		if(this.monday.equals("Stängt - Stängt"))
+		{
+			this.monday = "Stängt";
+		}
+		
+		this.tuesday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_TUESDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_TUESDAY_CLOSE));
+		if(this.tuesday.equals("Stängt - Stängt"))
+		{
+			this.tuesday = "Stängt";
+		}
+		
+		this.wednesday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_WEDNESDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_WEDNESDAY_CLOSE));
+		if(this.wednesday.equals("Stängt - Stängt"))
+		{
+			this.wednesday = "Stängt";
+		}
+		
+		this.thursday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_THURSDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_THURSDAY_CLOSE));
+		if(this.thursday.equals("Stängt - Stängt"))
+		{
+			this.thursday = "Stängt";
+		}
+		
+		this.friday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_FRIDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_FRIDAY_CLOSE));
+		if(this.friday.equals("Stängt - Stängt"))
+		{
+			this.friday = "Stängt";
+		}
+		
+		this.saturday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_SATURDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_SATURDAY_CLOSE));
+		if(this.saturday.equals("Stängt - Stängt"))
+		{
+			this.saturday = "Stängt";
+		}
+		
+		this.sunday = c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_SUNDAY_OPEN)) + " - " + c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_SUNDAY_CLOSE));
+		if(this.sunday.equals("Stängt - Stängt"))
+		{
+			this.sunday = "Stängt";
+		}
+		
+		this.daily = Boolean.parseBoolean(c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_DAILY)));
+		this.standard = Boolean.parseBoolean(c.getString(c.getColumnIndex(RestaurantsEntry.COLUMN_NAME_STANDARD)));
 		
 		//Check todays open times
 		this.today = timesToday();
 	}
 	
 	//Creating restaurant from values. Needs name, adress, number, url, extra, monday, tuesday, wednesday, thursday, friday, saturday, sunday, idname. In that order.
-	public Restaurant(String name, String address, int number, String url, String extra, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday, String idname)
+	public Restaurant(String name, String address, String number, String url, String extra, String monday, String tuesday, String wednesday, String thursday, String friday, String saturday, String sunday, String idname)
 	{
 		this.name = name;
 		this.address = address;
@@ -107,7 +156,6 @@ public class Restaurant {
 		Time today = new Time(Time.getCurrentTimezone());
 		today.setToNow();
 		int day = today.weekDay;
-		
 		if (day == today.MONDAY)
 		{
 			return monday;
@@ -165,12 +213,8 @@ public class Restaurant {
 	
 	public String getNumber()
 	{
-		String numberRaw = "0" + Integer.toString(number);
-		String subString1 = numberRaw.substring(0, 4);
-		String subString2 = numberRaw.substring(4, numberRaw.length());
-		String numberString = subString1 + "-" + subString2;
-		
-		return numberString;
+
+		return number;
 	}
 	
 	public String getUrl()
@@ -228,6 +272,16 @@ public class Restaurant {
 		return idname;
 	}
 	
+	public boolean hasDaily()
+	{
+		return daily;
+	}
+	
+	public boolean hasStandard()
+	{
+		return standard;
+	}
+	
 	//Setters
 	
 	public void setName(String name)
@@ -240,7 +294,7 @@ public class Restaurant {
 		this.address = address;
 	}
 	
-	public void setNumber(int number)
+	public void setNumber(String number)
 	{
 		this.number = number;
 	}
@@ -290,6 +344,16 @@ public class Restaurant {
 		this.sunday = sunday;
 	}
 	
+	public void setDaily(boolean daily)
+	{
+		this.daily = daily;
+	}
+	
+	public void setStandard(boolean standard)
+	{
+		this.standard = standard;
+	}
+	
 	
 	//Checking if the restaurant is currently open
 	public boolean isOpen()
@@ -336,5 +400,11 @@ public class Restaurant {
 				return false;
 			}
 		}
+	}
+	
+	public DailyMenu getDailyMenu(SQLiteDatabase db)
+	{
+		Log.i(TAG, idname);
+		return new DailyMenu(idname, db);
 	}
 }

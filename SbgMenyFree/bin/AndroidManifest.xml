@@ -65,6 +65,14 @@
         
         <activity android:name="com.google.android.gms.ads.AdActivity"
              android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+        <activity
+            android:name="com.styrdal.sbgmenyfree.DisplayDaily"
+            android:label="@string/title_activity_display_daily"
+            android:parentActivityName="DisplayRestaurant" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="DisplayRestaurant" />
+        </activity>
         
     </application>
 	

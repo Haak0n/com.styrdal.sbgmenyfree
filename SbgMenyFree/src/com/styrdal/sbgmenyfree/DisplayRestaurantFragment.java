@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -98,11 +99,43 @@ public class DisplayRestaurantFragment extends Fragment {
 		number2.setText(restaurant.getNumber());
 		number2.setOnClickListener(callNumber);
 		
-		TextView url2 = (TextView) fragmentView.findViewById(R.id.display_restaurant_url2);
-		url2.setText(restaurant.getUrl());
-		if(!restaurant.getUrl().equals(null))
+		if(!restaurant.getUrl().equals(""))
 		{
+			Log.i(TAG, restaurant.getUrl());
+			TextView url1 = (TextView) fragmentView.findViewById(R.id.display_restaurant_url1);
+			url1.setVisibility(View.VISIBLE);
+			
+			TextView url2 = (TextView) fragmentView.findViewById(R.id.display_restaurant_url2);
+			url2.setText(restaurant.getUrl());
+			url2.setVisibility(View.VISIBLE);
 			url2.setOnClickListener(showUrl);
+		}
+		
+		if(restaurant.hasDaily())
+		{
+			DailyMenu dailyMenu = restaurant.getDailyMenu(db);
+			
+			TextView daily1 = (TextView) fragmentView.findViewById(R.id.display_restaurant_daily1);
+			daily1.setVisibility(View.VISIBLE);
+			
+			TextView daily2 = (TextView) fragmentView.findViewById(R.id.display_restaurant_daily2);
+			daily2.setVisibility(View.VISIBLE);
+			daily2.setText(dailyMenu.today());
+			
+			View divider5 = (View) fragmentView.findViewById(R.id.display_restaurant_divider5);
+			divider5.setVisibility(View.VISIBLE);
+		}
+		
+		if(restaurant.hasDaily())
+		{
+			Button dailyButton = (Button) fragmentView.findViewById(R.id.display_restaurant_daily_button);
+			dailyButton.setVisibility(Button.VISIBLE);
+		}
+		
+		if(restaurant.hasStandard())
+		{
+			Button standardButton = (Button) fragmentView.findViewById(R.id.display_restaurant_menu_button);
+			standardButton.setVisibility(Button.VISIBLE);
 		}
 		
 		TextView extra2 = (TextView) fragmentView.findViewById(R.id.display_restaurant_extra);
@@ -110,12 +143,6 @@ public class DisplayRestaurantFragment extends Fragment {
 		
 		getActivity().setTitle(restaurant.getName());
 		return fragmentView;
-	}
-	
-	//Menu button listener
-	public void showMenu(View view) {
-		Intent intent = new Intent(getActivity(), DisplayMenu.class);
-		startActivity(intent);
 	}
 	
 	private View.OnClickListener showTimes = new View.OnClickListener() {
